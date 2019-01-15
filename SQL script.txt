@@ -1,0 +1,37 @@
+import pandas
+import ibm_db_dbi
+
+#connection for pandas
+pconn = ibm_db_dbi.Connection(conn)
+
+%load_ext sql
+%sql ibm_db_sa://mns***:****.services.dal.bluemix.net:5****/BLUDB
+
+import pandas
+chicago_socioeconomic_data=pandas.read_csv('https://data.cityofchicago.org/resource/jcxq-k9xf.csv')
+%sql PERSIST chicago_socioeconomic_data
+
+%sql SELECT * FROM chicago_socioeconomic_data LIMIT 10;
+
+%sql SELECT * FROM chicago_socioeconomic_data where hardship_index>50
+%sql SELECT * FROM chicago_socioeconomic_data ORDER BY hardship_index LIMIT 4;
+%sql SELECT * FROM chicago_socioeconomic_data ORDER BY hardship_index DESC LIMIT 4;
+%sql SELECT * FROM chicago_socioeconomic_data where per_capita_income>60000;
+
+
+%sql select COUNT("Name_of_School") from SCHOOLS;
+%sql select MAX("Safety_Score") from SCHOOLS;
+%sql select "Name_of_School" from SCHOOLS where "Safety_Score"=99
+
+%sql select Count(*) from Census_Data
+%sql select * from chicago_crime_data fetch first row only
+%sql select "Name_of_School" from chicago_public_schools limit 2
+%sql select Distinct("Community_Area_Number") from chicago_public_schools limit 10
+%sql select count(*) from chicago_crime_data where "Location_Description"='GAS STATION';
+%sql select "Community_Area_Number",COUNT("Name_of_School") from chicago_public_schools
+      GROUP BY "Community_Area_Number" ORDER BY COUNT("Name_of_School") DESC LIMIT 10;
+
+%sql select COUNT(*) from chicago_crime_data where "Primary_Type"='MOTOR VEHICLE THEFT';
+%sql select chicago_public_schools."Community_Area_Number","Average_Student_Attendance",census_data.hardship_index
+      from chicago_public_schools INNER JOIN census_data ON chicago_public_schools."Community_Area_Number"=census_data."Community_Area_Number"
+      where census_data.hardship_index=96 ORDER BY "Average_Student_Attendance" LIMIT 1 ;      
